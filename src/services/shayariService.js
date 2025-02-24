@@ -6,20 +6,28 @@ import {
 
 const shayariCollection = collection(db, "shayaris");
 
-// ✅ Add Shayari with Full Name
-export const addShayari = async (text, userId, fullName) => {
-  console.log("Storing Shayari with Name:", fullName); // ✅ Debugging
+// ✅ Post Shayari with user ID and custom author name
+export const postShayari = async (text, author, userId) => {
+  if (!userId) {
+    console.error("User ID is undefined. Cannot post Shayari.");
+    return;
+  }
 
-  await addDoc(shayariCollection, {
-    text,
-    author: fullName || "Anonymous", // ✅ Ensure full name is stored
-    userId,
-    likes: [],
-    createdAt: serverTimestamp(),
-  });
+  try {
+    await addDoc(shayariCollection, {
+      text,
+      author: author || "Anonymous", // If the author field is empty, default to "Anonymous"
+      userId,
+      likes: [],
+      createdAt: serverTimestamp(),
+    });
+    console.log("Shayari posted successfully!");
+  } catch (error) {
+    console.error("Error posting shayari:", error);
+  }
 };
 
-// Fetch all Shayaris
+// ✅ Fetch all Shayaris
 export const getShayaris = async () => {
   const querySnapshot = await getDocs(shayariCollection);
   return querySnapshot.docs.map((doc) => ({
@@ -28,7 +36,7 @@ export const getShayaris = async () => {
   }));
 };
 
-// Listen to Shayaris (Real-time updates)
+// ✅ Listen to Shayaris (Real-time updates)
 export const listenToShayaris = (setShayaris) => {
   return onSnapshot(shayariCollection, (snapshot) => {
     const shayaris = snapshot.docs.map((doc) => ({
@@ -39,30 +47,34 @@ export const listenToShayaris = (setShayaris) => {
   });
 };
 
-// Toggle Like/Unlike
+// ✅ Optimized Like/Unlike Function
 export const toggleLike = async (shayariId, userId) => {
   const shayariRef = doc(db, "shayaris", shayariId);
-  
+
   try {
+    // Fetch the specific Shayari document
     const querySnapshot = await getDocs(shayariCollection);
-    
-    querySnapshot.forEach(async (shayariDoc) => {
-      if (shayariDoc.id === shayariId) {
-        const shayariData = shayariDoc.data();
-        
-        if (shayariData.likes.includes(userId)) {
-          // Unlike
-          await updateDoc(shayariRef, {
-            likes: arrayRemove(userId),
-          });
-        } else {
-          // Like
-          await updateDoc(shayariRef, {
-            likes: arrayUnion(userId),
-          });
-        }
+    let shayariData = null;
+
+    querySnapshot.forEach((doc) => {
+      if (doc.id === shayariId) {
+        shayariData = doc.data();
       }
     });
+
+    if (!shayariData) return;
+
+    if (shayariData.likes.includes(userId)) {
+      // Unlike
+      await updateDoc(shayariRef, {
+        likes: arrayRemove(userId),
+      });
+    } else {
+      // Like
+      await updateDoc(shayariRef, {
+        likes: arrayUnion(userId),
+      });
+    }
   } catch (error) {
     console.error("Error toggling like:", error);
   }

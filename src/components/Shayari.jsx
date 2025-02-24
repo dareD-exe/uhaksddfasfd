@@ -1,61 +1,43 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { addShayari, listenToShayaris, toggleLike } from "../services/shayariService";
-import { getAuth } from "firebase/auth";
+import { listenToShayaris, toggleLike } from "../services/shayariService";
+import PostShayari from "../components/PostShayari";
+import styled from "styled-components";
 
 const Shayari = () => {
-  const { user, fullName } = useAuth();
+  const { user } = useAuth();
   const [shayaris, setShayaris] = useState([]);
-  const [newShayari, setNewShayari] = useState("");
-  const isGuest = user && getAuth().currentUser?.isAnonymous;
+  const [copyStatus, setCopyStatus] = useState({});
 
   useEffect(() => {
-    console.log("🔥 Full Name from AuthContext:", fullName); // ✅ Debugging
     const unsubscribe = listenToShayaris(setShayaris);
     return () => unsubscribe();
-  }, [fullName]);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!newShayari.trim() || !user || isGuest) return;
-
-    console.log("✅ Posting Shayari with Full Name:", fullName); // ✅ Debugging
-    await addShayari(newShayari, user.uid, fullName); // ✅ Send full name
-    setNewShayari("");
-  };
+  }, []);
 
   const handleLike = async (shayariId) => {
     if (!user) return;
     await toggleLike(shayariId, user.uid);
   };
 
+  const handleCopy = async (shayariId, text) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopyStatus((prev) => ({ ...prev, [shayariId]: true }));
+      setTimeout(() => {
+        setCopyStatus((prev) => ({ ...prev, [shayariId]: false }));
+      }, 2000);
+    } catch (error) {
+      console.error("Error copying text:", error);
+    }
+  };
+
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-gray-900 text-white rounded-lg shadow-lg">
+    <div className="max-w-2xl mx-auto p-6 bg-gray-900 text-white rounded-lg">
       <h2 className="text-3xl font-bold text-center mb-6 text-yellow-400">
         ✨ Explore Beautiful Shayaris
       </h2>
 
-      {isGuest && (
-        <div className="bg-yellow-500 text-gray-900 px-4 py-3 rounded-lg mb-4 text-center font-semibold">
-          🌞 <strong>Welcome, dear guest!</strong>
-          <p className="text-sm">Sign up to share your Shayari with the world. We’d love to hear from you! 😊</p>
-        </div>
-      )}
-
-      {user && !isGuest ? (
-        <form onSubmit={handleSubmit} className="mb-6 flex">
-          <input
-            type="text"
-            value={newShayari}
-            onChange={(e) => setNewShayari(e.target.value)}
-            placeholder="Write your Shayari here..."
-            className="outline-none flex-1 p-3 bg-gray-800 border border-gray-700 rounded-l"
-          />
-          <button type="submit" className="bg-blue-500 px-5 py-3 rounded-r flex items-center">
-            Post 📜
-          </button>
-        </form>
-      ) : null}
+      <PostShayari />
 
       <div className="space-y-4">
         {shayaris.length === 0 ? (
@@ -63,19 +45,42 @@ const Shayari = () => {
         ) : (
           shayaris.map((shayari) => (
             <div key={shayari.id} className="p-4 bg-gray-800 rounded-lg border border-gray-700 relative">
-              <p className="text-lg font-semibold text-gray-300">"{shayari.text}"</p>
-              <p className="text-sm text-gray-400 mt-1">— {shayari.author || "Anonymous"}</p> {/* ✅ Show Full Name */}
+              <p className="text-lg font-serif text-gray-300 text-center">"{shayari.text}"</p>
+              <p className="text-sm text-gray-400 mt-1 text-right">— {shayari.author || "Anonymous"}</p>
 
-              {/* Like Button on Right Side */}
-              <button
-                onClick={() => handleLike(shayari.id)}
-                className={`absolute top-2 right-2 px-4 py-2 rounded-md flex items-center space-x-2 ${
-                  user && shayari.likes.includes(user.uid) ? "bg-red-500 text-white" : "bg-gray-700 text-gray-300"
-                }`}
-              >
-                <span>{shayari.likes.length}</span>
-                <span>❤️</span>
-              </button>
+              <div className="flex justify-between items-center mt-3">
+                {/* Copy Button */}
+                <CopyButton onClick={() => handleCopy(shayari.id, shayari.text)}>
+                  <span className="text">
+                    {copyStatus[shayari.id] ? "Copied" : "Copy"}
+                  </span>
+                  <span className="svgIcon">
+                    <svg fill="white" viewBox="0 0 384 512" height="1em">
+                      <path d="M280 64h40c35.3 0 64 28.7 64 64V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V128C0 92.7 28.7 64 64 64h40 9.6C121 27.5 153.3 0 192 0s71 27.5 78.4 64H280zM64 112c-8.8 0-16 7.2-16 16V448c0 8.8 7.2 16 16 16H320c8.8 0 16-7.2 16-16V128c0-8.8-7.2-16-16-16H304v24c0 13.3-10.7 24-24 24H192 104c-13.3 0-24-10.7-24-24V112H64zm128-8a24 24 0 1 0 0-48 24 24 0 1 0 0 48z" />
+                    </svg>
+                  </span>
+                </CopyButton>
+
+                {/* Like Button */}
+                <LikeButton onClick={() => handleLike(shayari.id)} liked={shayari.likes?.includes(user?.uid)}>
+  <input type="checkbox" style={{ display: "none" }} />
+  <span className="like">
+    <svg
+      className="like-icon"
+      viewBox="0 0 24 24"
+      width="24"
+      height="24"
+      fill={shayari.likes?.includes(user?.uid) ? "#fc4e4e" : "#505050"}
+    >
+      <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z" />
+    </svg>
+    <span className="like-text">Likes</span>
+    
+  </span>
+  <span className="like-count">{shayari.likes?.length || 0}</span>
+</LikeButton>
+
+              </div>
             </div>
           ))
         )}
@@ -83,5 +88,67 @@ const Shayari = () => {
     </div>
   );
 };
+
+// Styled Components
+const CopyButton = styled.button`
+  width: 100px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: rgb(2, 153, 153);
+  margin-top: 10px;
+
+  .text {
+    width: 65%;
+    text-align: center;
+    color: white;
+    background-color: rgb(2, 153, 153);
+  }
+
+  .svgIcon {
+    width: 35%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+  }
+`;
+
+const LikeButton = styled.button`
+  width: 136px;
+  height: 48px;
+  border: none;
+  border-radius: 16px;
+  background-color: #1d1d1d;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  padding: 0 12px;
+  margin-top: 10px;
+
+  .like {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .like-text {
+    color: white;
+  }
+
+  .like-count {
+    color: #fc4e4e;
+  }
+
+  &:hover .like-icon {
+    fill: #fc4e4e;
+  }
+    
+`;
 
 export default Shayari;
