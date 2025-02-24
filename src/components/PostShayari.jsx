@@ -8,6 +8,15 @@ const PostShayari = () => {
   const [author, setAuthor] = useState("");
   const [error, setError] = useState("");
 
+  // Show signup prompt for guest users
+  if (!user || user.isAnonymous) {
+    return (
+      <div className="bg-slate-800 border border-slate-700 p-4 rounded-xl text-center text-slate-400 max-w-2xl mx-auto mb-6">
+        Sign up to share your Shayari with the world. We’d love to hear from you! 😊
+      </div>
+    );
+  }
+
   const handlePost = async () => {
     if (!user || !user.uid) {
       setError("You must be logged in to post a Shayari.");
@@ -20,10 +29,11 @@ const PostShayari = () => {
     }
 
     try {
-      await postShayari(shayari, author, user.uid);
       setShayari("");
-      setAuthor("");
-      setError("");
+setAuthor("");
+setError("");
+await postShayari(shayari, author, user.uid);
+
     } catch (error) {
       setError("Failed to post Shayari. Please try again.");
       console.error("Error posting Shayari:", error);
@@ -51,8 +61,8 @@ const PostShayari = () => {
         <button
           onClick={handlePost}
           className="cursor-pointer transition-all bg-gray-700 text-white px-6 py-2 rounded-lg border-green-400 border-b-[4px] hover:brightness-110 hover:-translate-y-[1px] hover:shadow-[0_4px_0_0_rgba(34,197,94,1)] active:shadow-[0_2px_0_0_rgba(34,197,94,1)] active:brightness-90 active:translate-y-[2px] shadow-green-300">
-  Post
-</button>
+          Post
+        </button>
       </div>
 
       {error && <p className="text-red-500 text-xs mt-1">{error}</p>}

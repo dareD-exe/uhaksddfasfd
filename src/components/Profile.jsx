@@ -23,12 +23,17 @@ const Profile = () => {
       if (user) {
         const q = query(collection(db, "shayaris"), where("userId", "==", user.uid));
         const querySnapshot = await getDocs(q);
-        setShayaris(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+        // Sort by most recent first
+        const sortedShayaris = querySnapshot.docs
+          .map(doc => ({ id: doc.id, ...doc.data() }))
+          .sort((a, b) => b.createdAt?.seconds - a.createdAt?.seconds);
+        setShayaris(sortedShayaris);
       }
     };
-
+  
     fetchShayaris();
   }, [user]);
+  
 
   const deleteShayari = async (shayariId) => {
     await deleteDoc(doc(db, "shayaris", shayariId));

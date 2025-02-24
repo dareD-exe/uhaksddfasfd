@@ -1,7 +1,7 @@
 import { db } from "../firebase";
 import { 
   collection, addDoc, getDocs, doc, updateDoc, 
-  arrayUnion, arrayRemove, serverTimestamp, onSnapshot 
+  arrayUnion, arrayRemove, serverTimestamp, onSnapshot, query, orderBy 
 } from "firebase/firestore";
 
 const shayariCollection = collection(db, "shayaris");
@@ -14,18 +14,25 @@ export const postShayari = async (text, author, userId) => {
   }
 
   try {
-    await addDoc(shayariCollection, {
+    const docRef = await addDoc(shayariCollection, {
       text,
-      author: author || "Anonymous", // If the author field is empty, default to "Anonymous"
+      author: author || "Anonymous",
       userId,
       likes: [],
       createdAt: serverTimestamp(),
     });
+
+    // Force update to ensure timestamp is set correctly
+    await updateDoc(docRef, {
+      createdAt: serverTimestamp(),
+    });
+
     console.log("Shayari posted successfully!");
   } catch (error) {
     console.error("Error posting shayari:", error);
   }
 };
+
 
 // ✅ Fetch all Shayaris
 export const getShayaris = async () => {
@@ -36,16 +43,21 @@ export const getShayaris = async () => {
   }));
 };
 
-// ✅ Listen to Shayaris (Real-time updates)
+// ✅ Listen to Shayaris (Real-time updates) with proper ordering
 export const listenToShayaris = (setShayaris) => {
-  return onSnapshot(shayariCollection, (snapshot) => {
+  const q = query(shayariCollection, orderBy("createdAt", "desc")); // Sort by newest first
+
+  return onSnapshot(q, (snapshot) => {
     const shayaris = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
+
     setShayaris(shayaris);
   });
 };
+
+
 
 // ✅ Optimized Like/Unlike Function
 export const toggleLike = async (shayariId, userId) => {

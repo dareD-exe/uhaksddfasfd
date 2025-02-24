@@ -14,9 +14,9 @@ const ShayariCard = ({ shayari, user }) => {
         const userRef = doc(db, "users", shayari.author);
         const userSnap = await getDoc(userRef);
         if (userSnap.exists()) {
-          setAuthorName(userSnap.data().firstName || "Unknown");
+          setAuthorName((userSnap.data().firstName || "Unknown").toUpperCase());
         } else {
-          setAuthorName("Unknown");
+          setAuthorName("UNKNOWN");
         }
       }
     };
@@ -52,20 +52,30 @@ const ShayariCard = ({ shayari, user }) => {
   };
 
   return (
-    <div className="bg-gray-800 p-4 rounded-lg shadow-md my-2 transition transform hover:scale-[1.02] hover:shadow-lg">
-      <p className="text-lg text-white font-medium text-center">"{shayari.text}"</p>
-      <p className="text-sm text-gray-400 text-center">— {authorName}</p>
+    <div className="bg-white bg-opacity-10 backdrop-blur-lg p-6 rounded-2xl shadow-2xl my-4 transition-transform hover:scale-105 hover:shadow-yellow-500/50">
+
+<p className="text-2xl font-serif text-white font-semibold text-center italic tracking-wide">"{shayari.text}"</p>
+
+      <p className="text-sm text-gray-400 text-center">— {authorName}</p> {/* Author in Uppercase */}
 
       <div className="flex justify-end mt-2">
-        <button
-          onClick={handleLike}
-          className={`flex items-center space-x-1 px-3 py-1 rounded-md transition-all duration-200 ${
-            isLiked ? "bg-red-600 text-white scale-110" : "bg-gray-700 text-gray-300 hover:bg-red-500 hover:text-white"
-          }`}
-        >
-          <span className="text-sm">{likes.length}</span>
-          <FaHeart />
-        </button>
+      <button
+  onClick={handleLike}
+  className={`flex items-center space-x-2 px-4 py-2 rounded-full transition-all duration-300 ${
+    isLiked
+      ? "bg-red-500 text-white scale-110 shadow-lg shadow-red-500/50"
+      : "bg-gray-700 text-gray-300 hover:bg-red-400 hover:text-white hover:scale-105 hover:shadow-red-500/30"
+  }`}
+>
+  <span className="text-base font-medium">{likes.length}</span>
+  <FaHeart
+    className={`transition-transform duration-300 ${
+      isLiked ? "scale-150 text-red-500 animate-ping" : "scale-100"
+    }`}
+  />
+</button>
+
+
       </div>
     </div>
   );
