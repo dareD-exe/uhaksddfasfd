@@ -28,15 +28,15 @@ const Login = () => {
   };
 
   return (
-    <div className="flex flex-col items-center mt-10">
-      <h2 className="text-xl mb-4">Login</h2>
-      <form onSubmit={handleLogin} className="flex flex-col">
-        <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="mb-2 p-2 border rounded" />
-        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} className="mb-2 p-2 border rounded" />
-        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Login</button>
+    <div className="space-y-4 max-w-md mx-auto p-6 bg-gray-900 text-white rounded-lg shadow-lg">
+      <h2 className="text-2xl font-bold text-center text-yellow-400 mb-4">Login</h2>
+      <form onSubmit={handleLogin} className="space-y-4 w-full p-3 bg-gray-800 border border-gray-700 rounded">
+        <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="outline-none w-full p-3 bg-gray-800 border border-gray-700 rounded" />
+        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} className="outline-none w-full p-3 bg-gray-800 border border-gray-700 rounded"/>
+         <button type="submit" className="w-full bg-blue-500 p-3 rounded font-semibold">Login</button>
       </form>
-      <button onClick={loginWithGoogle} className="bg-red-500 text-white px-4 py-2 rounded mt-2">Login with Google</button>
-      <button onClick={handleGuestLogin} className="bg-gray-500 text-white px-4 py-2 rounded mt-2">Continue as Guest</button>
+      <button onClick={loginWithGoogle} className="w-full bg-red-500 p-3 rounded font-semibold">Login with Google</button>
+      <button onClick={handleGuestLogin} className="w-full bg-gray-500 p-3 rounded font-semibold">Continue as Guest</button>
     </div>
   );
 };
