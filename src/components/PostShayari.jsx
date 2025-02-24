@@ -33,7 +33,7 @@ const PostShayari = () => {
   return (
     <div className="bg-slate-800 border border-slate-700 p-4 rounded-xl text-sm max-w-2xl mx-auto mb-6">
       <h2 className="text-center text-slate-400 text-lg font-bold mb-2">Post your Shayari</h2>
-      
+
       <textarea
         value={shayari}
         onChange={(e) => setShayari(e.target.value)}
@@ -41,23 +41,21 @@ const PostShayari = () => {
         className="w-full h-32 p-4 bg-gray-800 text-white border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 font-serif text-lg leading-relaxed resize-none"
       ></textarea>
 
-      <input
-        className="bg-slate-700 text-slate-300 w-full mt-2 placeholder:text-slate-400 border border-slate-600 outline-none rounded-lg p-2 duration-300 focus:border-slate-300"
-        placeholder="Author's name"
-        value={author}
-        onChange={(e) => setAuthor(e.target.value)}
-      />
-
-      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
-
-      <div className="flex justify-end items-center mt-3">
+      <div className="flex items-center mt-2 space-x-2">
+        <input
+          className="flex-1 bg-slate-700 text-slate-300 placeholder:text-slate-400 border border-slate-600 outline-none rounded-lg p-2 duration-300 focus:border-slate-300"
+          placeholder="Author's name"
+          value={author}
+          onChange={(e) => setAuthor(e.target.value)}
+        />
         <button
           onClick={handlePost}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center transition duration-300"
-        >
-          Post
-        </button>
+          className="cursor-pointer transition-all bg-gray-700 text-white px-6 py-2 rounded-lg border-green-400 border-b-[4px] hover:brightness-110 hover:-translate-y-[1px] hover:shadow-[0_4px_0_0_rgba(34,197,94,1)] active:shadow-[0_2px_0_0_rgba(34,197,94,1)] active:brightness-90 active:translate-y-[2px] shadow-green-300">
+  Post
+</button>
       </div>
+
+      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
     </div>
   );
 };
