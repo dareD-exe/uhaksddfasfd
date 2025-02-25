@@ -111,44 +111,69 @@ const Profile = () => {
           <p className="text-gray-400 mt-2">You haven't posted any Shayaris yet.</p>
         ) : (
           <ul className="mt-4 space-y-3">
-            {shayaris.map((shayari) => (
-              <li
-                key={shayari.id}
-                className="bg-gray-700 p-4 rounded-xl flex justify-between items-center shadow-md hover:bg-gray-600 transition duration-200"
-              >
-                {editingId === shayari.id ? (
-                  <>
-                    <textarea
-                      value={newText}
-                      onChange={(e) => setNewText(e.target.value)}
-                      rows="1"
-                      className="bg-gray-900 text-white px-3 py-2 rounded-lg w-full shadow-inner focus:outline-none focus:ring-2 focus:ring-yellow-400 transition resize-none overflow-hidden"
-                    />
-                    <div className="flex space-x-2 ml-2">
-                      <button onClick={saveEdit} className="bg-green-500 hover:bg-green-600 px-3 py-1 rounded-lg shadow">
-                        <CheckCircle size={20} />
-                      </button>
-                      <button onClick={() => setEditingId(null)} className="bg-gray-500 hover:bg-gray-600 px-3 py-1 rounded-lg shadow">
-                        <XCircle size={20} />
-                      </button>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <p className="flex-1 whitespace-pre-wrap">{shayari.text}</p>
-                    <div className="flex space-x-2 ml-2">
-                      <button onClick={() => startEditing(shayari)} className="bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded-lg shadow">
-                        <PencilLine size={20} />
-                      </button>
-                      <button onClick={() => deleteShayari(shayari.id)} className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded-lg shadow">
-                        <Trash2 size={20} />
-                      </button>
-                    </div>
-                  </>
-                )}
-              </li>
-            ))}
-          </ul>
+  {shayaris.map((shayari) => (
+    <li
+      key={shayari.id}
+      className="bg-gray-700 p-4 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center shadow-md hover:bg-gray-600 transition duration-200"
+    >
+      {editingId === shayari.id ? (
+        <>
+          <textarea
+            value={newText}
+            onChange={(e) => setNewText(e.target.value)}
+            ref={(el) => {
+              if (el) {
+                el.style.height = "auto"; // Reset height
+                el.style.height = `${el.scrollHeight}px`; // Adjust height
+              }
+            }}
+            rows="1"
+            className="bg-gray-900 text-white px-3 py-2 rounded-lg w-full shadow-inner focus:outline-none focus:ring-2 focus:ring-yellow-400 transition resize-none overflow-hidden text-sm sm:text-base"
+          />
+
+          <div className="flex space-x-2 mt-2 sm:mt-0">
+            <button
+              onClick={saveEdit}
+              className="bg-green-500 hover:bg-green-600 px-3 py-1 rounded-lg shadow"
+            >
+              <CheckCircle size={20} />
+            </button>
+            <button
+              onClick={() => {
+                setEditingId(null);
+                setNewText(""); // Reset newText when cancelling
+              }}
+              className="bg-gray-500 hover:bg-gray-600 px-3 py-1 rounded-lg shadow"
+            >
+              <XCircle size={20} />
+            </button>
+          </div>
+        </>
+      ) : (
+        <>
+          <p className="flex-1 whitespace-pre-wrap text-sm sm:text-base break-words">
+            {shayari.text}
+          </p>
+          <div className="flex space-x-2 mt-2 sm:mt-0">
+            <button
+              onClick={() => startEditing(shayari)}
+              className="bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded-lg shadow"
+            >
+              <PencilLine size={20} />
+            </button>
+            <button
+              onClick={() => deleteShayari(shayari.id)}
+              className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded-lg shadow"
+            >
+              <Trash2 size={20} />
+            </button>
+          </div>
+        </>
+      )}
+    </li>
+  ))}
+</ul>
+
         )}
       </div>
     </div>

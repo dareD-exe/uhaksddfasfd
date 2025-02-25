@@ -57,20 +57,18 @@ const ShayariCard = ({ shayari, user }) => {
   onClick={handleLike}
   className={`flex items-center space-x-2 px-4 py-2 rounded-full transition-all duration-300 ${
     isLiked
-      ? "bg-red-500 text-white scale-110 shadow-lg shadow-red-500/50"
-      : "bg-gray-700 text-gray-300 hover:bg-red-400 hover:text-white hover:scale-105 hover:shadow-red-500/30"
+      ? "bg-red-600 text-white scale-110 shadow-md shadow-red-500/50"
+      : "bg-gray-700 text-gray-300 hover:bg-red-500 hover:text-white hover:scale-105 hover:shadow-red-500/50"
   }`}
 >
-
-  <span className="text-base font-medium">{likes.length}</span>
   <FaHeart
-  className={`transition-all duration-300 ${
-    isLiked ? "scale-125 text-red-500" : "scale-100 text-gray-300"
-  }`}
-/>
-
-
+    className={`transition-all duration-300 ${
+      isLiked ? "scale-125 text-white" : "scale-100 text-gray-300"
+    }`}
+  />
+  <span className="text-base font-medium">{likes.length}</span>
 </button>
+
 
 
       </div>

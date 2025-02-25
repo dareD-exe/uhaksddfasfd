@@ -1,8 +1,6 @@
 import { db } from "../firebase";
-import { 
-  collection, addDoc, getDocs, doc, updateDoc, 
-  arrayUnion, arrayRemove, serverTimestamp, onSnapshot, query, orderBy 
-} from "firebase/firestore";
+import { collection, addDoc, getDocs, doc, updateDoc, getDoc, arrayUnion, arrayRemove, serverTimestamp, onSnapshot, query, orderBy } from "firebase/firestore";
+
 
 const shayariCollection = collection(db, "shayaris");
 
@@ -61,33 +59,30 @@ export const listenToShayaris = (setShayaris) => {
 
 // ✅ Optimized Like/Unlike Function
 export const toggleLike = async (shayariId, userId) => {
+  if (!userId) return console.error("❌ User is not authenticated.");
+
   const shayariRef = doc(db, "shayaris", shayariId);
+  const shayariSnap = await getDoc(shayariRef);
+
+  if (!shayariSnap.exists()) {
+    return console.error("❌ Shayari not found.");
+  }
+
+  const shayariData = shayariSnap.data();
+  let updatedLikes = shayariData.likes || [];
+
+  if (updatedLikes.includes(userId)) {
+    updatedLikes = updatedLikes.filter((id) => id !== userId);
+  } else {
+    updatedLikes.push(userId);
+  }
 
   try {
-    // Fetch the specific Shayari document
-    const querySnapshot = await getDocs(shayariCollection);
-    let shayariData = null;
-
-    querySnapshot.forEach((doc) => {
-      if (doc.id === shayariId) {
-        shayariData = doc.data();
-      }
-    });
-
-    if (!shayariData) return;
-
-    if (shayariData.likes.includes(userId)) {
-      // Unlike
-      await updateDoc(shayariRef, {
-        likes: arrayRemove(userId),
-      });
-    } else {
-      // Like
-      await updateDoc(shayariRef, {
-        likes: arrayUnion(userId),
-      });
-    }
+    await updateDoc(shayariRef, { likes: updatedLikes });
+    console.log("✅ Like toggled successfully");
   } catch (error) {
-    console.error("Error toggling like:", error);
+    console.error("❌ Error toggling like:", error);
   }
 };
+
+
