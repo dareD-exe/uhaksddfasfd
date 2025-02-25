@@ -11,3 +11,23 @@ input:-webkit-autofill {
   -webkit-text-fill-color: #f3f4f6 !important; /* Text color for autofill */
   transition: background-color 5000s ease-in-out 0s; /* Smooth transition */
 }
+
+/* Target the main scrollable container */
+html, body {
+  overflow: hidden; /* Disable default scroll */
+}
+
+#root {
+  overflow-y: auto; /* Allow scrolling only within the app */
+  max-height: 100vh; /* Prevent overflow beyond viewport */
+}
+
+/* Completely hide scrollbar but allow scrolling */
+#root::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+#root {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}

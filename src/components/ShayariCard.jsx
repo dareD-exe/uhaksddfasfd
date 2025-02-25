@@ -52,7 +52,8 @@ const ShayariCard = ({ shayari, user }) => {
   };
 
   return (
-    <div className="bg-white bg-opacity-10 backdrop-blur-lg p-6 rounded-2xl shadow-2xl my-4 transition-transform hover:scale-105 hover:shadow-yellow-500/50">
+    <div className="bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-700 my-4 transition-transform hover:scale-105 hover:shadow-yellow-500/50">
+
 
 <p className="text-2xl font-serif text-white font-semibold text-center italic tracking-wide">"{shayari.text}"</p>
 
@@ -67,6 +68,7 @@ const ShayariCard = ({ shayari, user }) => {
       : "bg-gray-700 text-gray-300 hover:bg-red-400 hover:text-white hover:scale-105 hover:shadow-red-500/30"
   }`}
 >
+
   <span className="text-base font-medium">{likes.length}</span>
   <FaHeart
     className={`transition-transform duration-300 ${

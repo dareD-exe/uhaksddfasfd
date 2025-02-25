@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { db } from "../firebase";
 import { collection, query, where, getDocs, deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
+import { PencilLine, Trash2, CheckCircle, XCircle } from "lucide-react";
 
 const Profile = () => {
   const { user, fullName, email, logout } = useAuth();
@@ -11,33 +12,31 @@ const Profile = () => {
   const [newText, setNewText] = useState("");
   const navigate = useNavigate();
 
-  // Redirect to home if user is not logged in
+  // Redirect if user not logged in
   useEffect(() => {
     if (!user) {
       navigate("/");
     }
   }, [user, navigate]);
 
+  // Fetch user shayaris
   useEffect(() => {
     const fetchShayaris = async () => {
       if (user) {
         const q = query(collection(db, "shayaris"), where("userId", "==", user.uid));
         const querySnapshot = await getDocs(q);
-        // Sort by most recent first
         const sortedShayaris = querySnapshot.docs
-          .map(doc => ({ id: doc.id, ...doc.data() }))
+          .map((doc) => ({ id: doc.id, ...doc.data() }))
           .sort((a, b) => b.createdAt?.seconds - a.createdAt?.seconds);
         setShayaris(sortedShayaris);
       }
     };
-  
     fetchShayaris();
   }, [user]);
-  
 
   const deleteShayari = async (shayariId) => {
     await deleteDoc(doc(db, "shayaris", shayariId));
-    setShayaris(shayaris.filter(shayari => shayari.id !== shayariId));
+    setShayaris(shayaris.filter((shayari) => shayari.id !== shayariId));
   };
 
   const startEditing = (shayari) => {
@@ -48,7 +47,10 @@ const Profile = () => {
   const saveEdit = async () => {
     if (newText.trim() === "") return;
     await updateDoc(doc(db, "shayaris", editingId), { text: newText });
-    setShayaris(shayaris.map(s => (s.id === editingId ? { ...s, text: newText } : s)));
+    setShayaris((prev) => [
+      { id: editingId, text: newText, animate: true },
+      ...prev.filter((s) => s.id !== editingId),
+    ]);
     setEditingId(null);
     setNewText("");
   };
@@ -60,16 +62,26 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white py-10 px-6">
-      <div className="max-w-lg mx-auto bg-gray-800 p-6 rounded-lg shadow-lg">
-        <h2 className="text-yellow-400 text-2xl font-bold text-center">Profile</h2>
+
+      {/* Profile Card */}
+      <div className="max-w-2xl mx-auto bg-gray-800 p-6 rounded-2xl shadow-2xl">
+        <h2 className="text-2xl font-bold text-white text-center bg-gradient-to-r from-yellow-500 to-red-500 px-4 py-2 rounded-lg shadow-lg">
+          Profile
+        </h2>
 
         {/* User Info */}
-        <div className="bg-gray-700 p-4 rounded-lg mt-4 text-center">
-          <p><strong>Name:</strong> {fullName}</p>
-          <p><strong>Email:</strong> {email || "No Email"}</p>
-          <button onClick={handleLogout} className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded mt-3">
-            Logout
-          </button>
+        <div className="bg-gray-700 p-5 rounded-xl mt-4 text-center shadow-lg">
+          <div className="flex flex-col items-center mb-4">
+            <div className="w-24 h-24 rounded-full bg-gray-600 flex items-center justify-center text-3xl text-white shadow-lg">
+              {fullName ? fullName.charAt(0) : "U"}
+            </div>
+            <p className="mt-3">
+              <strong>Name:</strong> {fullName}
+            </p>
+            <p>
+              <strong>Email:</strong> {email || "No Email"}
+            </p>
+          </div>
         </div>
 
         {/* Shayari List */}
@@ -79,23 +91,49 @@ const Profile = () => {
         ) : (
           <ul className="mt-4 space-y-3">
             {shayaris.map((shayari) => (
-              <li key={shayari.id} className="bg-gray-700 p-3 rounded-lg flex justify-between items-center">
+              <li
+                key={shayari.id}
+                className="bg-gray-700 p-4 rounded-xl flex justify-between items-center shadow-md hover:bg-gray-600 transition duration-200"
+              >
                 {editingId === shayari.id ? (
                   <>
-                    <input
-                      type="text"
+                    <textarea
                       value={newText}
                       onChange={(e) => setNewText(e.target.value)}
-                      className="bg-gray-900 text-white px-2 py-1 rounded w-full"
+                      rows={newText.split("\n").length}
+                      className="bg-gray-900 text-white px-3 py-2 rounded-lg w-full shadow-inner focus:outline-none focus:ring-2 focus:ring-yellow-400 transition resize-none overflow-hidden"
                     />
-                    <button onClick={saveEdit} className="bg-green-500 px-3 py-1 rounded ml-2">Save</button>
+                    <div className="flex space-x-2 ml-2">
+                      <button
+                        onClick={saveEdit}
+                        className="bg-green-500 hover:bg-green-600 px-3 py-1 rounded-lg shadow"
+                      >
+                        <CheckCircle size={20} />
+                      </button>
+                      <button
+                        onClick={() => setEditingId(null)}
+                        className="bg-gray-500 hover:bg-gray-600 px-3 py-1 rounded-lg shadow"
+                      >
+                        <XCircle size={20} />
+                      </button>
+                    </div>
                   </>
                 ) : (
                   <>
-                    <span>{shayari.text}</span>
-                    <div>
-                      <button onClick={() => startEditing(shayari)} className="bg-blue-500 px-3 py-1 rounded mx-1">Edit</button>
-                      <button onClick={() => deleteShayari(shayari.id)} className="bg-red-500 px-3 py-1 rounded">Delete</button>
+                    <p className="flex-1">{shayari.text}</p>
+                    <div className="flex space-x-2 ml-2">
+                      <button
+                        onClick={() => startEditing(shayari)}
+                        className="bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded-lg shadow"
+                      >
+                        <PencilLine size={20} />
+                      </button>
+                      <button
+                        onClick={() => deleteShayari(shayari.id)}
+                        className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded-lg shadow"
+                      >
+                        <Trash2 size={20} />
+                      </button>
                     </div>
                   </>
                 )}

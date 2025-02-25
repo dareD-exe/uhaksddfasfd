@@ -1,9 +1,0 @@
-/* Autofill Fix */
-input:-webkit-autofill {
-    background-color: #1f2937 !important; /* Match your manual fill background */
-    color: #f3f4f6 !important; /* Match your text color */
-    box-shadow: 0 0 0px 1000px #1f2937 inset !important; /* Override default yellow */
-    -webkit-text-fill-color: #f3f4f6 !important; /* Text color for autofill */
-    transition: background-color 5000s ease-in-out 0s; /* Smooth transition */
-  }
-  
