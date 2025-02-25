@@ -17,7 +17,7 @@ const Signup = () => {
   });
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData({ ...formData, [e.target.name]: e.target.value.trimStart() });
   };
 
   const handleSubmit = async (e) => {
@@ -28,24 +28,43 @@ const Signup = () => {
       return;
     }
 
+    // Strong password validation
+    const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+    if (!passwordRegex.test(formData.password)) {
+      toast.error("Password must be at least 8 characters, include a number & a special character.");
+      return;
+    }
+
     try {
+      const trimmedData = {
+        firstName: formData.firstName.trim(),
+        lastName: formData.lastName.trim(),
+        age: formData.age.trim(),
+        email: formData.email.trim(),
+        password: formData.password.trim(),
+      };
+
       await signupWithEmail(
-        formData.firstName,
-        formData.lastName,
-        formData.age,
-        formData.email,
-        formData.password
+        trimmedData.firstName,
+        trimmedData.lastName,
+        trimmedData.age,
+        trimmedData.email,
+        trimmedData.password
       );
+
       toast.success("Signup successful!");
-      navigate("/"); // Redirect immediately after success
+      navigate("/"); // Redirect after success
     } catch (error) {
-      toast.error("Signup failed. Please try again.");
+      if (error.code === "auth/email-already-in-use") {
+        toast.error("This email is already in use. Please try logging in.");
+      } else {
+        toast.error("Signup failed. Please try again.");
+      }
     }
   };
 
   return (
     <div className="max-w-md mx-auto p-6 bg-gray-900 text-white rounded-lg shadow-lg">
-      {/* Toast Notification Container */}
       <Toaster position="top-center" reverseOrder={false} />
 
       <h2 className="text-2xl font-bold text-center text-yellow-400 mb-4">
@@ -72,10 +91,7 @@ const Signup = () => {
             />
           )
         )}
-        <button
-          type="submit"
-          className="w-full bg-blue-500 p-3 rounded font-semibold"
-        >
+        <button type="submit" className="w-full bg-blue-500 p-3 rounded font-semibold">
           Sign Up
         </button>
       </form>

@@ -31,25 +31,18 @@ const ShayariCard = ({ shayari, user }) => {
 
   const handleLike = async () => {
     if (!user) return;
-
+  
     const shayariRef = doc(db, "shayaris", shayari.id);
-    let updatedLikes = [...likes];
-
+    setIsLiked(!isLiked); // Optimistic update for smoother UI
+    setLikes((prev) => (isLiked ? prev.filter((uid) => uid !== user.uid) : [...prev, user.uid]));
+  
     if (isLiked) {
-      updatedLikes = updatedLikes.filter((uid) => uid !== user.uid);
-      await updateDoc(shayariRef, {
-        likes: arrayRemove(user.uid),
-      });
+      await updateDoc(shayariRef, { likes: arrayRemove(user.uid) });
     } else {
-      updatedLikes.push(user.uid);
-      await updateDoc(shayariRef, {
-        likes: arrayUnion(user.uid),
-      });
+      await updateDoc(shayariRef, { likes: arrayUnion(user.uid) });
     }
-
-    setLikes(updatedLikes);
-    setIsLiked(!isLiked);
   };
+  
 
   return (
     <div className="bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-700 my-4 transition-transform hover:scale-105 hover:shadow-yellow-500/50">
@@ -71,10 +64,12 @@ const ShayariCard = ({ shayari, user }) => {
 
   <span className="text-base font-medium">{likes.length}</span>
   <FaHeart
-    className={`transition-transform duration-300 ${
-      isLiked ? "scale-150 text-red-500 animate-ping" : "scale-100"
-    }`}
-  />
+  className={`transition-all duration-300 ${
+    isLiked ? "scale-125 text-red-500" : "scale-100 text-gray-300"
+  }`}
+/>
+
+
 </button>
 
 

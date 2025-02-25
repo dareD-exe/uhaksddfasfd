@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { toast, Toaster } from "react-hot-toast";
+
 
 const Login = () => {
   const { loginWithEmail, loginWithGoogle, loginAsGuest } = useAuth();
@@ -12,18 +14,23 @@ const Login = () => {
     e.preventDefault();
     try {
       await loginWithEmail(email, password);
+      toast.success("Login successful! Welcome back.");
       navigate("/"); // Redirect after login
+
     } catch (error) {
-      console.error("Login failed:", error.message);
+      toast.error(`Login failed: ${error.message}`);
     }
   };
 
   const handleGuestLogin = async () => {
     try {
       await loginAsGuest();
+      toast.success("Logged in as Guest! Enjoy browsing.");
       navigate("/"); // Redirect to home after guest login
+
     } catch (error) {
-      console.error("Guest login failed:", error.message);
+      toast.error(`Guest login failed: ${error.message}`);
+
     }
   };
 
