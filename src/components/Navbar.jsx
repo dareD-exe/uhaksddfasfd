@@ -51,9 +51,8 @@ const Navbar = () => {
 </button>
 
 {showDropdown && (
-  <div className="absolute right-0 mt-2 w-24 rounded-lg bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-10 focus:outline-none transition-all duration-200 ease-out scale-95 opacity-0 animate-fadeIn">
-
-<Link
+  <div className="absolute right-0 mt-2 w-24 rounded-lg bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-10 focus:outline-none">
+  <Link
       to="/profile"
       className="block px-4 py-2 hover:bg-gray-700 transition rounded-xl"
       onClick={() => setShowDropdown(false)}
