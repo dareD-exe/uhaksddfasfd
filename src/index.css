@@ -17,6 +17,12 @@ html, body {
   overflow: hidden; /* Disable default scroll */
 }
 
+body {
+  margin: 0;
+  padding: 0;
+}
+
+
 #root {
   overflow-y: auto; /* Allow scrolling only within the app */
   max-height: 100vh; /* Prevent overflow beyond viewport */

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom"; // ✅ Import Link
 import { toast, Toaster } from "react-hot-toast";
 
 const Login = () => {
@@ -44,14 +44,14 @@ const Login = () => {
           placeholder="Email" 
           value={email} 
           onChange={(e) => setEmail(e.target.value)} 
-          className="outline-none w-full p-3 bg-[#334155] border border-[#334155] text-white placeholder-[#C3C7E1] outline-none rounded focus:ring-2 focus:ring-[#FACC15] transition duration-200"
+          className="outline-none w-full p-3 bg-[#334155] border border-[#334155] text-white placeholder-[#C3C7E1] rounded focus:ring-2 focus:ring-[#FACC15] transition duration-200"
         />
         <input 
           type="password" 
           placeholder="Password" 
           value={password} 
           onChange={(e) => setPassword(e.target.value)} 
-          className="outline-none w-full p-3 bg-[#334155] border border-[#334155] text-white placeholder-[#C3C7E1] outline-none rounded focus:ring-2 focus:ring-[#FACC15] transition duration-200"
+          className="outline-none w-full p-3 bg-[#334155] border border-[#334155] text-white placeholder-[#C3C7E1] rounded focus:ring-2 focus:ring-[#FACC15] transition duration-200"
         />
         <button 
           type="submit" 
@@ -71,6 +71,14 @@ const Login = () => {
         className="w-full bg-[#535C91] text-white p-3 rounded font-semibold hover:bg-[#9290C3] transition mt-2">
         Continue as Guest
       </button>
+
+      {/* ✅ "Sign Up" Link Below the Login Form */}
+      <p className="text-center text-gray-400 mt-4">
+        Don't have an account?{" "}
+        <Link to="/signup" className="text-blue-400 hover:underline">
+          Sign Up
+        </Link>
+      </p>
     </div>
   );
 };

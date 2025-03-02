@@ -5,31 +5,31 @@ import { collection, addDoc, getDocs, doc, updateDoc, getDoc, arrayUnion, arrayR
 const shayariCollection = collection(db, "shayaris");
 
 // ✅ Post Shayari with user ID and custom author name
-export const postShayari = async (text, author, userId) => {
+export const postShayari = async (text, author, category, userId) => {
   if (!userId) {
     console.error("User ID is undefined. Cannot post Shayari.");
     return;
   }
 
   try {
-    const docRef = await addDoc(shayariCollection, {
+    const docRef = await addDoc(collection(db, "shayaris"), {
       text,
       author: author || "Anonymous",
+      category: category || "Other", // ✅ Ensure category is saved
       userId,
       likes: [],
       createdAt: serverTimestamp(),
     });
 
-    // Force update to ensure timestamp is set correctly
-    await updateDoc(docRef, {
-      createdAt: serverTimestamp(),
-    });
+    await updateDoc(docRef, { createdAt: serverTimestamp() });
 
-    console.log("Shayari posted successfully!");
+    console.log("✅ Shayari posted successfully with category:", category);
   } catch (error) {
-    console.error("Error posting shayari:", error);
+    console.error("❌ Error posting shayari:", error);
   }
 };
+
+
 
 
 // ✅ Fetch all Shayaris

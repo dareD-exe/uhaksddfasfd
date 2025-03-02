@@ -3,7 +3,9 @@ import { useEffect, useState } from "react";
 import { db } from "../firebase";
 import { collection, query, where, getDocs, deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
-import { PencilLine, Trash2, CheckCircle, XCircle } from "lucide-react";
+import { PencilLine, Trash2, CheckCircle, XCircle, LogOut } from "lucide-react";
+import Navbar from "../components/Navbar";
+import MobileNav from "../components/MobileNav";
 
 const Profile = () => {
   const { user, fullName, email, logout } = useAuth();
@@ -12,14 +14,12 @@ const Profile = () => {
   const [newText, setNewText] = useState("");
   const navigate = useNavigate();
 
-  // Redirect if user not logged in
   useEffect(() => {
     if (!user) {
-      navigate("/");
+      navigate("/login");
     }
   }, [user, navigate]);
 
-  // Fetch user shayaris
   useEffect(() => {
     const fetchShayaris = async () => {
       if (user) {
@@ -34,9 +34,9 @@ const Profile = () => {
     fetchShayaris();
   }, [user]);
 
-  const deleteShayari = async (shayariId) => {
-    await deleteDoc(doc(db, "shayaris", shayariId));
-    setShayaris(shayaris.filter((shayari) => shayari.id !== shayariId));
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login");
   };
 
   const startEditing = (shayari) => {
@@ -45,31 +45,50 @@ const Profile = () => {
   };
 
   const saveEdit = async () => {
-    if (newText.trim() === "") return;
+    if (!editingId || newText.trim() === "") return;
     await updateDoc(doc(db, "shayaris", editingId), { text: newText });
-    setShayaris((prev) => [
-      { id: editingId, text: newText, animate: true },
-      ...prev.filter((s) => s.id !== editingId),
-    ]);
+
+    setShayaris((prev) =>
+      prev.map((shayari) =>
+        shayari.id === editingId ? { ...shayari, text: newText } : shayari
+      )
+    );
+
     setEditingId(null);
     setNewText("");
   };
 
-  const handleLogout = async () => {
-    await logout();
-    navigate("/");
+  const deleteShayari = async (shayariId) => {
+    await deleteDoc(doc(db, "shayaris", shayariId));
+    setShayaris(shayaris.filter((shayari) => shayari.id !== shayariId));
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white py-10 px-6">
+    <div className="min-h-screen bg-gray-900 text-white">
+      {/* ✅ Show Desktop Navbar */}
+      <div className="hidden lg:block">
+        <Navbar />
+      </div>
 
-      {/* Profile Card */}
+      {/* ✅ Show Mobile Top Bar */}
+      <div className="fixed top-0 left-0 w-full bg-[#070F2B]/70 backdrop-blur-lg text-white px-6 h-[4rem] flex justify-between items-center z-50 shadow-md lg:hidden">
+        <h1 className="text-xl font-bold tracking-wide">ZikrVerse</h1>
+        <button 
+          onClick={handleLogout} 
+          className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg flex items-center gap-2 shadow"
+        >
+          <LogOut size={20} />
+          <span className="hidden sm:inline">Logout</span>
+        </button>
+      </div>
+
+      {/* ✅ Profile Content */}
       <div className="max-w-2xl mx-auto bg-gray-800 p-6 rounded-2xl shadow-2xl">
         <h2 className="text-2xl font-bold text-white text-center bg-gradient-to-r from-yellow-500 to-red-500 px-4 py-2 rounded-lg shadow-lg">
           Profile
         </h2>
 
-        {/* User Info */}
+        {/* ✅ User Info */}
         <div className="bg-gray-700 p-5 rounded-xl mt-4 text-center shadow-lg">
           <div className="flex flex-col items-center mb-4">
             <div className="w-24 h-24 rounded-full bg-gray-600 flex items-center justify-center text-3xl text-white shadow-lg">
@@ -84,7 +103,7 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* Shayari List */}
+        {/* ✅ Shayari List */}
         <h3 className="text-lg font-semibold mt-6 text-yellow-400">Your Shayaris</h3>
         {shayaris.length === 0 ? (
           <p className="text-gray-400 mt-2">You haven't posted any Shayaris yet.</p>
@@ -93,17 +112,36 @@ const Profile = () => {
             {shayaris.map((shayari) => (
               <li
                 key={shayari.id}
-                className="bg-gray-700 p-4 rounded-xl flex justify-between items-center shadow-md hover:bg-gray-600 transition duration-200"
+                className="bg-gray-700 p-4 rounded-xl shadow-md hover:bg-gray-600 transition duration-200 flex flex-col"
               >
                 {editingId === shayari.id ? (
                   <>
+                    {/* ✅ Auto-resizing Textarea */}
                     <textarea
                       value={newText}
                       onChange={(e) => setNewText(e.target.value)}
-                      rows={newText.split("\n").length}
-                      className="bg-gray-900 text-white px-3 py-2 rounded-lg w-full shadow-inner focus:outline-none focus:ring-2 focus:ring-yellow-400 transition resize-none overflow-hidden"
+                      rows={1} // Start with 1 row
+                      className="bg-gray-900 text-white px-2 py-1 rounded-lg shadow-inner focus:outline-none focus:ring-2 focus:ring-yellow-400 transition w-full resize-none overflow-hidden"
+                      style={{
+                        minHeight: "1.5rem",
+                        height: "auto",
+                        maxHeight: "10rem",
+                        lineHeight: "1.5rem",
+                      }}
+                      ref={(el) => {
+                        if (el) {
+                          el.style.height = "auto";
+                          el.style.height = `${el.scrollHeight}px`;
+                        }
+                      }}
+                      onInput={(e) => {
+                        e.target.style.height = "auto";
+                        e.target.style.height = `${e.target.scrollHeight}px`;
+                      }}
                     />
-                    <div className="flex space-x-2 ml-2">
+
+                    {/* ✅ Buttons Positioned Below in All Screens */}
+                    <div className="flex justify-end space-x-2 w-full mt-2">
                       <button
                         onClick={saveEdit}
                         className="bg-green-500 hover:bg-green-600 px-3 py-1 rounded-lg shadow"
@@ -120,8 +158,11 @@ const Profile = () => {
                   </>
                 ) : (
                   <>
-                    <p className="flex-1">{shayari.text}</p>
-                    <div className="flex space-x-2 ml-2">
+                    {/* ✅ Shayari Text */}
+                    <p className="text-sm sm:text-base">{shayari.text}</p>
+
+                    {/* ✅ Buttons Below Text on All Screens */}
+                    <div className="flex justify-end space-x-2 w-full mt-2">
                       <button
                         onClick={() => startEditing(shayari)}
                         className="bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded-lg shadow"
@@ -141,6 +182,11 @@ const Profile = () => {
             ))}
           </ul>
         )}
+      </div>
+
+      {/* ✅ Mobile Navbar */}
+      <div className="lg:hidden">
+        <MobileNav />
       </div>
     </div>
   );
