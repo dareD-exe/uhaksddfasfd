@@ -1,7 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInAnonymously } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
-
+import { getFirestore, initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDCS1GpbSmKl8IGMCX3Viv96ZsXy7dSz54",
@@ -18,6 +17,10 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
 const signInGuest = () => signInAnonymously(auth);
-const db = getFirestore(app);  // Initialize Firestore
+
+// ✅ Fix: Enable multi-tab persistence
+const db = initializeFirestore(app, {
+  localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
+});
 
 export { auth, googleProvider, signInGuest, db };

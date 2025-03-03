@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { db } from "../firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
@@ -6,16 +6,21 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import MobileNav from "../components/MobileNav";
 
+const categories = ["Sad", "Romantic", "Motivational", "Friendship", "Life", "Inspirational", "Other"];
+
 const CreateShayari = () => {
   const { user, fullName } = useAuth();
   const [shayari, setShayari] = useState("");
   const [author, setAuthor] = useState(fullName || ""); // Default to user's name
+  const [category, setCategory] = useState("Other"); // Default to "Other"
   const navigate = useNavigate();
 
-  if (!user) {
-    navigate("/login");
-    return null;
-  }
+  // ✅ Use useEffect to navigate if user is not logged in
+  useEffect(() => {
+    if (!user) {
+      navigate("/login");
+    }
+  }, [user, navigate]);
 
   const handlePost = async () => {
     if (!shayari.trim() || !author.trim()) return;
@@ -23,12 +28,14 @@ const CreateShayari = () => {
     await addDoc(collection(db, "shayaris"), {
       text: shayari,
       author: author,
+      category: category, // ✅ Save category in Firestore
       userId: user.uid,
       createdAt: serverTimestamp(),
     });
 
     setShayari("");
     setAuthor(fullName || ""); // Reset author field
+    setCategory("Other"); // Reset category
     navigate("/");
   };
 
@@ -60,6 +67,19 @@ const CreateShayari = () => {
           onChange={(e) => setShayari(e.target.value)}
           style={{ minHeight: "4rem", maxHeight: "10rem", overflow: "hidden" }}
         />
+
+        {/* ✅ Category Dropdown */}
+        <select
+          className="w-full bg-gray-800 text-white px-4 py-2 mt-4 rounded-lg focus:ring-2 focus:ring-yellow-400"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+        >
+          {categories.map((cat) => (
+            <option key={cat} value={cat}>
+              {cat}
+            </option>
+          ))}
+        </select>
 
         <button
           onClick={handlePost}

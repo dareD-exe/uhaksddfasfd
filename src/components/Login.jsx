@@ -39,13 +39,16 @@ const Login = () => {
       </h2>
 
       <form onSubmit={handleLogin} className="space-y-4 w-full p-3 bg-[#1F2937] border border-white/20 rounded-lg shadow-md">
-        <input 
-          type="email" 
-          placeholder="Email" 
-          value={email} 
-          onChange={(e) => setEmail(e.target.value)} 
-          className="outline-none w-full p-3 bg-[#334155] border border-[#334155] text-white placeholder-[#C3C7E1] rounded focus:ring-2 focus:ring-[#FACC15] transition duration-200"
-        />
+      <input 
+  id="loginEmail"
+  name="email"
+  type="email" 
+  placeholder="Email" 
+  value={email} 
+  onChange={(e) => setEmail(e.target.value)} 
+  className="outline-none w-full p-3 bg-[#334155] border border-[#334155] text-white placeholder-[#C3C7E1] rounded focus:ring-2 focus:ring-[#FACC15] transition duration-200"
+/>
+
         <input 
           type="password" 
           placeholder="Password" 

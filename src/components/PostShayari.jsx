@@ -13,7 +13,7 @@ const PostShayari = () => {
 
   if (!user || user.isAnonymous) {
     return (
-      <div className="bg-[#1B1A55] border border-[#535C91] p-4 rounded-xl text-center text-[#9290C3] max-w-2xl mx-auto mb-6">
+      <div className="bg-[#1B1A55] border border-[#535C91] p-3 rounded-xl text-center text-[#9290C3] max-w-2xl mx-auto mb-4">
         Sign up to share your Shayari with the world. We’d love to hear from you! 😊
       </div>
     );
@@ -43,27 +43,31 @@ const PostShayari = () => {
   };
 
   return (
-    <div className="bg-[#1B1A55] border border-[#535C91] p-4 rounded-xl text-sm max-w-2xl mx-auto mb-6">
+    <div className="bg-[#1B1A55] border border-[#535C91] p-3 sm:p-4 rounded-xl text-sm max-w-2xl mx-auto mb-4 shadow-md">
       <h2 className="text-center text-[#9290C3] text-lg font-bold mb-2">Post your Shayari</h2>
 
       <textarea
         value={shayari}
         onChange={(e) => setShayari(e.target.value)}
         placeholder="Write your Shayari here..."
-        className="overflow-hidden w-full h-32 p-4 bg-[#070F2B] text-white border border-[#535C91] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FACC15] font-serif text-lg leading-relaxed resize-none"
+        className="w-full h-24 sm:h-28 p-3 bg-[#070F2B] text-white border border-[#535C91] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FACC15] font-serif text-lg leading-relaxed resize-none"
       ></textarea>
 
-      <div className="flex items-center mt-2 space-x-2">
-        <input
-          className="flex-1 bg-[#535C91] text-white placeholder:text-[#9290C3] border border-[#535C91] outline-none rounded-lg p-2 duration-300 focus:border-[#FACC15]"
-          placeholder="Author's name"
-          value={author}
-          onChange={(e) => setAuthor(e.target.value)}
-        />
+      {/* ✅ Mobile Responsive Fix - Stacked Layout on Mobile */}
+      <div className="flex flex-col sm:flex-row items-center mt-3 gap-2">
+      <input
+  id="authorName"
+  name="author"
+  className="w-full sm:flex-1 bg-[#535C91] text-white placeholder:text-[#9290C3] border border-[#535C91] outline-none rounded-lg px-3 py-2 duration-300 focus:border-[#FACC15]"
+  placeholder="Author's name"
+  value={author}
+  onChange={(e) => setAuthor(e.target.value)}
+/>
+
 
         {/* Category Dropdown */}
         <select
-          className="bg-[#535C91] text-white border border-[#535C91] outline-none rounded-lg p-2"
+          className="w-full sm:w-auto bg-[#535C91] text-white border border-[#535C91] outline-none rounded-lg px-3 py-2"
           value={category}
           onChange={(e) => setCategory(e.target.value)}
         >
@@ -76,13 +80,13 @@ const PostShayari = () => {
 
         <button
           onClick={handlePost}
-          className="cursor-pointer transition-all bg-[#535C91] text-white px-6 py-2 rounded-lg border-[#FACC15] border-b-[4px] hover:brightness-110 hover:-translate-y-[1px] hover:shadow-[0_4px_0_0_rgba(250,204,21,1)] active:shadow-[0_2px_0_0_rgba(250,204,21,1)] active:brightness-90 active:translate-y-[2px] shadow-[#FACC15]"
+          className="w-full sm:w-auto cursor-pointer transition-all bg-[#535C91] text-white px-6 py-2 rounded-lg border-[#FACC15] border-b-[4px] hover:brightness-110 hover:-translate-y-[1px] hover:shadow-[0_4px_0_0_rgba(250,204,21,1)] active:shadow-[0_2px_0_0_rgba(250,204,21,1)] active:brightness-90 active:translate-y-[2px] shadow-[#FACC15]"
         >
           Post
         </button>
       </div>
 
-      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+      {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
     </div>
   );
 };

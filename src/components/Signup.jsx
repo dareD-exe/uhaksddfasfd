@@ -70,24 +70,26 @@ const Signup = () => {
       <h2 className="text-2xl font-bold text-center text-[#FACC15] mb-4">Create an Account</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4 w-full p-3 bg-[#1F2937] border border-white/20 rounded-lg shadow-md">
-        {["firstName", "lastName", "age", "email", "password", "confirmPassword"].map((field, idx) => (
-          <input
-            key={idx}
-            type={
-              field === "age"
-                ? "number"
-                : field.toLowerCase().includes("password")
-                ? "password"
-                : "text"
-            }
-            name={field}
-            placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-            value={formData[field]}
-            onChange={handleChange}
-            className="outline-none w-full p-3 bg-[#334155] border border-[#334155] text-white placeholder-[#C3C7E1] rounded focus:ring-2 focus:ring-[#FACC15] transition duration-200"
-            required
-          />
-        ))}
+      {["firstName", "lastName", "age", "email", "password", "confirmPassword"].map((field, idx) => (
+  <input
+    key={idx}
+    id={field}  // ✅ Add ID for accessibility
+    name={field}  // ✅ Ensure each input has a name
+    type={
+      field === "age"
+        ? "number"
+        : field.toLowerCase().includes("password")
+        ? "password"
+        : "text"
+    }
+    placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+    value={formData[field]}
+    onChange={handleChange}
+    className="outline-none w-full p-3 bg-[#334155] border border-[#334155] text-white placeholder-[#C3C7E1] rounded focus:ring-2 focus:ring-[#FACC15] transition duration-200"
+    required
+  />
+))}
+
         <button type="submit" className="w-full bg-[#6E809E] text-white p-3 rounded font-semibold hover:bg-[#FACC15] hover:text-black transition">
           Sign Up
         </button>
